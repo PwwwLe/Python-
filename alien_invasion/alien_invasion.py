@@ -2,8 +2,8 @@ import sys
 
 import pygame
 
+from bullet import Bullet
 from settings import Settings
-
 from ship import Ship
 
 
@@ -24,11 +24,14 @@ class AlienInvasion:
 
         self.ship = Ship(self)
 
+        self.bullets = pygame.sprite.Group()
+
     def run_game(self):
         # 开始游戏主循环
         while True:
             self._check_events()
             self.ship.update()
+            self.bullets.update()
             self._update_screen()
 
             # 设置游戏帧率
@@ -39,6 +42,8 @@ class AlienInvasion:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 sys.exit()
+            elif event.type == pygame.K_SPACE:
+                self._fire_bullet()
             elif event.type == pygame.KEYDOWN:
                 self._check_keydown_events(event)
             elif event.type == pygame.KEYUP:
@@ -63,10 +68,16 @@ class AlienInvasion:
     def _update_screen(self):
         # 每次循环重绘屏幕
         self.screen.fill(self.settings.bg_color)
+        for bullet in self.bullets.sprites():
+            bullet.draw_bullet()
         self.ship.blitme()
 
         # 让最近绘制的屏幕可见
         pygame.display.update()
+
+    def _fire_bullet(self):
+        new_bullet = Bullet(self)
+        self.bullets.add(new_bullet)
 
 
 if __name__ == '__main__':
